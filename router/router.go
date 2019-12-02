@@ -3,17 +3,28 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/muxiaopie/go-mall/bootstrap"
+	"github.com/muxiaopie/go-mall/handler"
 	"github.com/muxiaopie/go-mall/handler/sd"
 	"github.com/muxiaopie/go-mall/router/middleware"
+	"github.com/muxiaopie/go-mall/service"
 )
 
 // 加载服务
-func Router()  {
+func Init()  {
 	var router *gin.Engine = bootstrap.Bootstrap.Router
 	router.Use(middleware.NoCache)
 	router.Use(middleware.Options)
 	router.Use(middleware.Secure)
 	router.Use(middleware.RequestId())
+
+	user := handler.User{
+		Sev:service.NewUserService(),
+	}
+
+	u := router.Group("/user")
+	{
+		u.POST("",user.User)
+	}
 
 	v1 := router.Group("/sd")
 	{

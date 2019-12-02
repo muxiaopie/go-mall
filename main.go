@@ -22,9 +22,11 @@ func main() {
 	// 加载gin
 	bootstrapper.Use(bootstrap.LoadGin())
 
+	// 加载数据库连接
 	bootstrapper.Use(bootstrap.LoadDatabase())
 
-	router.Router()
+	// 加载路由配置
+	router.Init()
 
 	// 启动服务
 	bootstrapper.Run(viper.GetString("addr"))
