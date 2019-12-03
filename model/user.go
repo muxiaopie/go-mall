@@ -7,7 +7,7 @@ type User struct {
 	Password string 	`json:"-"`
 	Phone    string 	`json:"phone"`
 	Email    string 	`json:"email"`
-	Status   uint 		`json:"status" gorm:"default:1"`
+	Status   uint 		`json:"-" gorm:"default:1"`
 	Avatar   string 	`json:"avatar"`
 	Introduction string `json:"introduction"`
 }

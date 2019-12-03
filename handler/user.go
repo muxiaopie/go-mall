@@ -7,22 +7,32 @@ import (
 	"github.com/muxiaopie/go-mall/pkg/enum"
 	"github.com/muxiaopie/go-mall/pkg/errno"
 	"github.com/muxiaopie/go-mall/pkg/jwt"
-
 	"github.com/asaskevich/govalidator"
-
 	"github.com/muxiaopie/go-mall/service"
 	"github.com/muxiaopie/go-mall/util"
 	"github.com/spf13/viper"
+	"regexp"
 )
 
-type User struct {
-	Sev service.UserService
-}
+type (
 
-type LoginForm struct {
-	UserName string `valid:"required" json:"username" form:"username"`
-	PassWord string `valid:"required" json:"password" form:"password"`
-}
+	User struct {
+		Sev service.UserService
+	}
+
+	LoginForm struct {
+		UserName string `valid:"required" json:"username" form:"username"`
+		PassWord string `valid:"required" json:"password" form:"password"`
+	}
+
+	RegisterForm struct {
+		UserName string `valid:"required,unique(username)"`
+		Email    string `valid:"email,required,unique(email)"`
+		PassWord string `valid:"required"`
+	}
+)
+
+
 
 func (u *User) User (c *gin.Context) error {
 	uid,err := userId(c)
@@ -62,6 +72,41 @@ func (u *User) Login(c *gin.Context) error {
 	}else{
 		return errors.New("密码不正确,请重试")
 	}
+}
+
+func (u *User) Register(c *gin.Context) error  {
+
+
+	var registerForm RegisterForm
+	if err := c.ShouldBindJSON(&registerForm); err != nil {
+		return err
+	}
+
+	/*govalidator.TagMap["unique"] = govalidator.Validator(func(username string) bool {
+		user,err := u.Sev.Find(enum.USERNAME,username)
+		if err != nil {
+			return true
+		}
+		if user.Id > 0 {
+			return false
+		}
+		return trueunique
+	})*/
+
+	govalidator.ParamTagMap["unique"] = govalidator.ParamValidator(func(str string, params ...string) bool {
+		fmt.Println(str)
+		return true
+	})
+	govalidator.ParamTagRegexMap["unique"] = regexp.MustCompile("^unique\\((\\w+)\\)$")
+
+	_, err := govalidator.ValidateStruct(registerForm)
+	if err != nil {
+		return errno.ParameterError(err.Error())
+	}
+
+	return errno.Success
+	return nil
+
 
 }
 

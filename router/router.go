@@ -27,6 +27,7 @@ func Init()  {
 
 
 	router.POST("/login",wrapper(user.Login))
+	router.POST("/register",wrapper(user.Register))
 
 	u := router.Group("/user",middleware.JWTAuth())
 	{
