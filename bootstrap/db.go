@@ -22,6 +22,8 @@ func LoadDatabase() func(*Bootstrapper) {
 
 		db.DB().SetMaxIdleConns(maxIdleConnection)
 		db.DB().SetMaxOpenConns(maxOpenConnection)
+
+		db.LogMode(true)
 		bootstrap.DB = db
 	}
 }

@@ -1,14 +1,15 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/muxiaopie/go-mall/bootstrap"
 	"github.com/muxiaopie/go-mall/model"
+	"github.com/muxiaopie/go-mall/pkg/enum"
 	"sync"
 )
 
 var once sync.Once
-
 
 // 获取repository
 func NewUserRepository() (userRepository UserRepository) {
@@ -22,7 +23,7 @@ func NewUserRepository() (userRepository UserRepository) {
 
 
 type UserRepository interface {
-	Find(id uint) (*model.User, error)
+	Find(action int,value string) (model.User, error)
 }
 
 type User struct {
@@ -30,12 +31,11 @@ type User struct {
 }
 
 // 查询服务
-func (repo *User) Find(id uint) (*model.User, error) {
-	user :=  &model.User{}
-	user.Id = uint(id)
-	if err := repo.DB.First(user).Error; err != nil {
-		return nil, err
+func (repo *User) Find(action int,value string) (user model.User, err error) {
+	if field ,ok := enum.FieldMap[action];ok {
+		err = repo.DB.Where(fmt.Sprintf("%s = ?",field), value).First(&user).Error
+		return
 	}
-	return user, nil
+	return
 }
 

@@ -5,6 +5,7 @@ import (
 	"github.com/muxiaopie/go-mall/bootstrap"
 	"github.com/muxiaopie/go-mall/handler"
 	"github.com/muxiaopie/go-mall/handler/sd"
+	"github.com/muxiaopie/go-mall/pkg/errno"
 	"github.com/muxiaopie/go-mall/router/middleware"
 	"github.com/muxiaopie/go-mall/service"
 )
@@ -17,13 +18,19 @@ func Init()  {
 	router.Use(middleware.Secure)
 	router.Use(middleware.RequestId())
 
+	router.NoMethod(errno.HandleNotFound)
+	router.NoRoute(errno.HandleNotFound)
+
 	user := handler.User{
 		Sev:service.NewUserService(),
 	}
 
-	u := router.Group("/user")
+
+	router.POST("/login",wrapper(user.Login))
+
+	u := router.Group("/user",middleware.JWTAuth())
 	{
-		u.POST("",user.User)
+		u.Any("",wrapper(user.User))
 	}
 
 	v1 := router.Group("/sd")
@@ -34,4 +41,6 @@ func Init()  {
 		v1.GET("/ram", sd.RAMCheck)
 	}
 }
+
+
 

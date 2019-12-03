@@ -21,7 +21,7 @@ func NewUserService() (userService UserService) {
 
 // service 服务
 type UserService interface {
-	Find (id uint) (*model.User, error)
+	Find (action int, value string) (model.User, error)
 }
 
 //
@@ -29,6 +29,10 @@ type User struct {
 	Repo repository.UserRepository
 }
 
-func (s *User) Find (id uint) (*model.User, error) {
-	return s.Repo.Find(id)
+func (ser *User) Find (action int, value string) (model.User, error) {
+	return ser.Repo.Find(action,value)
 }
+
+
+
+
