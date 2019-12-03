@@ -27,7 +27,7 @@ func JWTAuth() gin.HandlerFunc {
 			}else {
 				httpErr = errno.ServerError
 			}
-			c.JSON(httpErr.Code,httpErr)
+			c.JSON(httpErr.StatusCode,httpErr)
 			c.Abort()
 			return
 		}

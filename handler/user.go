@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/muxiaopie/go-mall/pkg/enum"
 	"github.com/muxiaopie/go-mall/pkg/errno"
@@ -24,24 +25,26 @@ type LoginForm struct {
 }
 
 func (u *User) User (c *gin.Context) error {
-	id := c.Param("id")
+	uid,err := userId(c)
+	if err != nil {
+		return err
+	}
+	id := fmt.Sprintf("%d",uid)
 	user,_ := u.Sev.Find(enum.ID,id)
 	c.JSON(200,user)
 	return nil
 }
 
-
+// 登陆接口
 func (u *User) Login(c *gin.Context) error {
 	var loginForm LoginForm
 	if err := c.ShouldBindJSON(&loginForm); err != nil {
 		return err
 	}
-
 	_, err := govalidator.ValidateStruct(loginForm)
 	if err != nil {
 		return errno.ParameterError(err.Error())
 	}
-
 	user,err := u.Sev.Find(enum.USERNAME,loginForm.UserName)
 	if err!= nil {
 		return err

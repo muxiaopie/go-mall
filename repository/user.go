@@ -32,8 +32,14 @@ type User struct {
 
 // 查询服务
 func (repo *User) Find(action int,value string) (user model.User, err error) {
+
 	if field ,ok := enum.FieldMap[action];ok {
-		err = repo.DB.Where(fmt.Sprintf("%s = ?",field), value).First(&user).Error
+		if action == enum.ID {
+			err = repo.DB.First(&user,value).Error
+			fmt.Println(user)
+		}else {
+			err = repo.DB.Where(fmt.Sprintf("%s = ?",field), value).First(&user).Error
+		}
 		return
 	}
 	return
