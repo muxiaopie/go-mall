@@ -5,7 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/muxiaopie/go-mall/bootstrap"
 	"github.com/muxiaopie/go-mall/model"
-	"github.com/muxiaopie/go-mall/pkg/enum"
+	//"github.com/muxiaopie/go-mall/pkg/enum"
 	"sync"
 )
 
@@ -23,15 +23,27 @@ func NewUserRepository() (userRepository UserRepository) {
 
 
 type UserRepository interface {
-	Find(action int,value string) (model.User, error)
+	Find(field ,value string) (model.User, error)
+	Create(model.User)(model.User,error)
 }
 
 type User struct {
 	DB *gorm.DB
 }
 
+// 查找
+func (repo *User) Find(field string,value string) (user model.User, err error) {
+	err = repo.DB.Where(fmt.Sprintf("%s = ?",field), value).First(&user).Error
+	return
+}
+
+// 创建
+func (repo *User) Create(user model.User) (model.User,error) {
+	return user,repo.DB.Create(&user).Error
+}
+
 // 查询服务
-func (repo *User) Find(action int,value string) (user model.User, err error) {
+/*func (repo *User) Find(action int,value string) (user model.User, err error) {
 
 	if field ,ok := enum.FieldMap[action];ok {
 		if action == enum.ID {
@@ -43,5 +55,5 @@ func (repo *User) Find(action int,value string) (user model.User, err error) {
 		return
 	}
 	return
-}
+}*/
 

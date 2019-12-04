@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/muxiaopie/go-mall/model"
 	"github.com/muxiaopie/go-mall/pkg/enum"
 	"github.com/muxiaopie/go-mall/pkg/errno"
 	"github.com/muxiaopie/go-mall/pkg/jwt"
@@ -32,8 +33,7 @@ type (
 	}
 )
 
-
-
+// 用户信息
 func (u *User) User (c *gin.Context) error {
 	uid,err := userId(c)
 	if err != nil {
@@ -74,39 +74,49 @@ func (u *User) Login(c *gin.Context) error {
 	}
 }
 
+// 注册接口
 func (u *User) Register(c *gin.Context) error  {
-
-
 	var registerForm RegisterForm
 	if err := c.ShouldBindJSON(&registerForm); err != nil {
 		return err
 	}
-
-	/*govalidator.TagMap["unique"] = govalidator.Validator(func(username string) bool {
-		user,err := u.Sev.Find(enum.USERNAME,username)
+	// 验证唯一性
+	govalidator.ParamTagMap["unique"] = govalidator.ParamValidator(func(value string, params ...string) bool {
+		field := params[0]
+		user,err := u.Sev.FindFieldValue(field,value)
 		if err != nil {
 			return true
 		}
 		if user.Id > 0 {
 			return false
 		}
-		return trueunique
-	})*/
-
-	govalidator.ParamTagMap["unique"] = govalidator.ParamValidator(func(str string, params ...string) bool {
-		fmt.Println(str)
 		return true
 	})
 	govalidator.ParamTagRegexMap["unique"] = regexp.MustCompile("^unique\\((\\w+)\\)$")
 
+	// 验证
 	_, err := govalidator.ValidateStruct(registerForm)
 	if err != nil {
 		return errno.ParameterError(err.Error())
 	}
 
-	return errno.Success
+	// 加密
+	password,err := util.HashPassword(registerForm.PassWord)
+	if err != nil {
+		return errno.OtherError("注册失败")
+	}
+
+	// 入库
+	user := model.User{
+		Username:registerForm.UserName,
+		Email:registerForm.Email,
+		Password:password,
+	}
+	userInfo,err := u.Sev.Create(user)
+	if err != nil {
+		return err
+	}
+	c.JSON(200,userInfo)
 	return nil
-
-
 }
 
