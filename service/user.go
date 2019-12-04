@@ -7,12 +7,10 @@ import (
 	"sync"
 )
 
-
-var	once sync.Once
-
+var	userOnce sync.Once
 // 获取服务
 func NewUserService() (userService UserService) {
-	once.Do(func() {
+	userOnce.Do(func() {
 		userService = &User{
 			Repo:repository.NewUserRepository(),
 		}

@@ -23,7 +23,6 @@ type (
 		UserName string `valid:"required" json:"username" form:"username"`
 		PassWord string `valid:"required" json:"password" form:"password"`
 	}
-
 	RegisterForm struct {
 		UserName string `valid:"required,unique(username)"`
 		Email    string `valid:"email,required,unique(email)"`
@@ -38,7 +37,10 @@ func (u *User) User (c *gin.Context) error {
 		return err
 	}
 	id := fmt.Sprintf("%d", uid)
-	user, _ := u.Sev.Find(enum.ID, id)
+	user, err := u.Sev.Find(enum.ID, id)
+	if err != nil {
+		return errno.NotFound
+	}
 	c.JSON(statusOk, user)
 	return nil
 }
@@ -103,7 +105,6 @@ func (u *User) Register(c *gin.Context) error {
 	if err != nil {
 		return errno.OtherError("注册失败")
 	}
-
 	// 入库
 	user := model.User{
 		Username: registerForm.UserName,
@@ -117,3 +118,6 @@ func (u *User) Register(c *gin.Context) error {
 	c.JSON(statusOk, userInfo)
 	return nil
 }
+
+
+// 修改的接口
