@@ -39,7 +39,7 @@ func (u *User) User (c *gin.Context) error {
 	}
 	id := fmt.Sprintf("%d", uid)
 	user, _ := u.Sev.Find(enum.ID, id)
-	c.JSON(200, user)
+	c.JSON(statusOk, user)
 	return nil
 }
 
@@ -59,7 +59,7 @@ func (u *User) Login(c *gin.Context) error {
 	}
 	if util.CheckPasswordHash(loginForm.PassWord, user.Password) {
 		token, _ := jwt.GenerateToken(user.Id)
-		c.JSON(200, struct {
+		c.JSON(statusOk, struct {
 			Token      string `json:"token"`
 			ExpireTime string `json:"expire_time"`
 		}{
@@ -114,6 +114,6 @@ func (u *User) Register(c *gin.Context) error {
 	if err != nil {
 		return err
 	}
-	c.JSON(200, userInfo)
+	c.JSON(statusOk, userInfo)
 	return nil
 }

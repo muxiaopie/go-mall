@@ -4,6 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/muxiaopie/go-mall/pkg/errno"
 	"github.com/muxiaopie/go-mall/pkg/jwt"
+	"net/http"
+)
+
+var (
+	statusOk = http.StatusOK
 )
 
 func userId(c *gin.Context) (uint, error) {
