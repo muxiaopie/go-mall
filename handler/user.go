@@ -3,12 +3,12 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/muxiaopie/go-mall/model"
 	"github.com/muxiaopie/go-mall/pkg/enum"
 	"github.com/muxiaopie/go-mall/pkg/errno"
 	"github.com/muxiaopie/go-mall/pkg/jwt"
-	"github.com/asaskevich/govalidator"
 	"github.com/muxiaopie/go-mall/service"
 	"github.com/muxiaopie/go-mall/util"
 	"github.com/spf13/viper"
@@ -16,11 +16,9 @@ import (
 )
 
 type (
-
 	User struct {
 		Sev service.UserService
 	}
-
 	LoginForm struct {
 		UserName string `valid:"required" json:"username" form:"username"`
 		PassWord string `valid:"required" json:"password" form:"password"`
@@ -35,13 +33,13 @@ type (
 
 // 用户信息
 func (u *User) User (c *gin.Context) error {
-	uid,err := userId(c)
+	uid, err := userId(c)
 	if err != nil {
 		return err
 	}
-	id := fmt.Sprintf("%d",uid)
-	user,_ := u.Sev.Find(enum.ID,id)
-	c.JSON(200,user)
+	id := fmt.Sprintf("%d", uid)
+	user, _ := u.Sev.Find(enum.ID, id)
+	c.JSON(200, user)
 	return nil
 }
 
@@ -55,27 +53,27 @@ func (u *User) Login(c *gin.Context) error {
 	if err != nil {
 		return errno.ParameterError(err.Error())
 	}
-	user,err := u.Sev.Find(enum.USERNAME,loginForm.UserName)
-	if err!= nil {
+	user, err := u.Sev.Find(enum.USERNAME, loginForm.UserName)
+	if err != nil {
 		return err
 	}
-	if util.CheckPasswordHash(loginForm.PassWord,user.Password) {
-		token,_ := jwt.GenerateToken(user.Id)
+	if util.CheckPasswordHash(loginForm.PassWord, user.Password) {
+		token, _ := jwt.GenerateToken(user.Id)
 		c.JSON(200, struct {
-			Token 	   string `json:"token"`
+			Token      string `json:"token"`
 			ExpireTime string `json:"expire_time"`
 		}{
-			Token:token,
-			ExpireTime:viper.GetString("expireTime"),
+			Token:      token,
+			ExpireTime: viper.GetString("expireTime"),
 		})
 		return nil
-	}else{
+	} else {
 		return errors.New("密码不正确,请重试")
 	}
 }
 
 // 注册接口
-func (u *User) Register(c *gin.Context) error  {
+func (u *User) Register(c *gin.Context) error {
 	var registerForm RegisterForm
 	if err := c.ShouldBindJSON(&registerForm); err != nil {
 		return err
@@ -83,7 +81,7 @@ func (u *User) Register(c *gin.Context) error  {
 	// 验证唯一性
 	govalidator.ParamTagMap["unique"] = govalidator.ParamValidator(func(value string, params ...string) bool {
 		field := params[0]
-		user,err := u.Sev.FindFieldValue(field,value)
+		user, err := u.Sev.FindFieldValue(field, value)
 		if err != nil {
 			return true
 		}
@@ -101,22 +99,21 @@ func (u *User) Register(c *gin.Context) error  {
 	}
 
 	// 加密
-	password,err := util.HashPassword(registerForm.PassWord)
+	password, err := util.HashPassword(registerForm.PassWord)
 	if err != nil {
 		return errno.OtherError("注册失败")
 	}
 
 	// 入库
 	user := model.User{
-		Username:registerForm.UserName,
-		Email:registerForm.Email,
-		Password:password,
+		Username: registerForm.UserName,
+		Email:    registerForm.Email,
+		Password: password,
 	}
-	userInfo,err := u.Sev.Create(user)
+	userInfo, err := u.Sev.Create(user)
 	if err != nil {
 		return err
 	}
-	c.JSON(200,userInfo)
+	c.JSON(200, userInfo)
 	return nil
 }
-

@@ -28,7 +28,6 @@ type UserService interface {
 
 }
 
-//
 type User struct {
 	Repo repository.UserRepository
 }

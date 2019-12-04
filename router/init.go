@@ -14,7 +14,7 @@ func wrapper(handler HandlerFunc) func(c *gin.Context) {
 		if err != nil {
 			var Err *errno.Error
 			if e,ok := err.(*errno.Error); ok {
-				Err = e
+				Err = e;
 			}else if e, ok := err.(error); ok {
 				Err = errno.OtherError(e.Error())
 			}else{

@@ -21,7 +21,7 @@ func NewUserRepository() (userRepository UserRepository) {
 	return userRepository
 }
 
-
+// user
 type UserRepository interface {
 	Find(field ,value string) (model.User, error)
 	Create(model.User)(model.User,error)
@@ -42,18 +42,4 @@ func (repo *User) Create(user model.User) (model.User,error) {
 	return user,repo.DB.Create(&user).Error
 }
 
-// 查询服务
-/*func (repo *User) Find(action int,value string) (user model.User, err error) {
-
-	if field ,ok := enum.FieldMap[action];ok {
-		if action == enum.ID {
-			err = repo.DB.First(&user,value).Error
-			fmt.Println(user)
-		}else {
-			err = repo.DB.Where(fmt.Sprintf("%s = ?",field), value).First(&user).Error
-		}
-		return
-	}
-	return
-}*/
 
