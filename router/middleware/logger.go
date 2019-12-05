@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/muxiaopie/go-mall/pkg/logger"
@@ -46,7 +47,8 @@ func Logger() gin.HandlerFunc {
 		}else{
 			Log.Info(c.Request)
 		}
-		Log.Info(entry)
+		msg, _ := json.Marshal(entry)
+		Log.Info(string(msg))
 		/*Log.Infof("| %3d | %13v | %15s | %s  %s |",
 			statusCode,
 			latency,
