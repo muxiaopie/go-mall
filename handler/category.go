@@ -4,9 +4,8 @@ import "github.com/gin-gonic/gin"
 
 type (
 	Category struct {
-
+		Sev
 	}
-
 	CategoryForm struct {
 		Name string `valid:"required,unique(name)"`
 		Desc string `valid:"email,required"`
