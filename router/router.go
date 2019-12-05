@@ -17,6 +17,7 @@ func Init()  {
 	router.Use(middleware.Options)
 	router.Use(middleware.Secure)
 	router.Use(middleware.RequestId())
+	router.Use(middleware.Logger())
 
 	router.NoMethod(errno.HandleNotFound)
 	router.NoRoute(errno.HandleNotFound)
