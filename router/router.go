@@ -22,11 +22,12 @@ func Init()  {
 	router.NoRoute(errno.HandleNotFound)
 
 	user := handler.User{
-		Sev:service.NewUserService(),
+		Srv:service.NewUserService(),
 	}
 
 
 	router.POST("/login",wrapper(user.Login))
+	router.Any("/users",wrapper(user.Users))
 	router.POST("/register",wrapper(user.Register))
 
 	u := router.Group("/user",middleware.JWTAuth())

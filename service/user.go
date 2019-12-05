@@ -23,6 +23,7 @@ type UserService interface {
 	Find (action int, value string) (model.User, error)
 	FindFieldValue(field string,value string) (model.User,error)
 	Create(user model.User) (model.User,error)
+	Pagination(page,limit int) *repository.Pagination
 
 }
 
@@ -30,21 +31,25 @@ type User struct {
 	Repo repository.UserRepository
 }
 
-func (ser *User) Find (action int, value string) (user model.User, err error) {
+func (srv *User) Find (action int, value string) (user model.User, err error) {
 	if field ,ok := enum.FieldMap[action];ok {
-		return ser.Repo.Find(field,value)
+		return srv.Repo.Find(field,value)
 	}
 	return
 }
 
-func (ser *User) FindFieldValue (field string, value string) (user model.User, err error) {
-	return ser.Repo.Find(field,value)
+func (srv *User) FindFieldValue (field string, value string) (user model.User, err error) {
+	return srv.Repo.Find(field,value)
 }
 
-func (ser *User) Create (user model.User) (model.User, error) {
-	return ser.Repo.Create(user)
+func (srv *User) Create (user model.User) (model.User, error) {
+	return srv.Repo.Create(user)
 }
 
+func (srv *User) Pagination (page,limit int) *repository.Pagination {
+	var maps map[string]interface{}
+	return srv.Repo.Pagination(page,limit,maps)
+}
 
 
 

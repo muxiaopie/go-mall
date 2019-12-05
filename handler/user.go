@@ -17,7 +17,7 @@ import (
 
 type (
 	User struct {
-		Sev service.UserService
+		Srv service.UserService
 	}
 	LoginForm struct {
 		UserName string `valid:"required" json:"username" form:"username"`
@@ -31,13 +31,21 @@ type (
 )
 
 // 用户信息
+func (u *User) Users (c *gin.Context) error {
+	P := u.Srv.Pagination(1,1)
+
+	c.JSON(statusOk,P)
+	return nil
+}
+
+// 用户信息
 func (u *User) User (c *gin.Context) error {
 	uid, err := userId(c)
 	if err != nil {
 		return err
 	}
 	id := fmt.Sprintf("%d", uid)
-	user, err := u.Sev.Find(enum.ID, id)
+	user, err := u.Srv.Find(enum.ID, id)
 	if err != nil {
 		return errno.NotFound
 	}
@@ -55,7 +63,7 @@ func (u *User) Login(c *gin.Context) error {
 	if err != nil {
 		return errno.ParameterError(err.Error())
 	}
-	user, err := u.Sev.Find(enum.USERNAME, loginForm.UserName)
+	user, err := u.Srv.Find(enum.USERNAME, loginForm.UserName)
 	if err != nil {
 		return err
 	}
@@ -83,7 +91,7 @@ func (u *User) Register(c *gin.Context) error {
 	// 验证唯一性
 	govalidator.ParamTagMap["unique"] = govalidator.ParamValidator(func(value string, params ...string) bool {
 		field := params[0]
-		user, err := u.Sev.FindFieldValue(field, value)
+		user, err := u.Srv.FindFieldValue(field, value)
 		if err != nil {
 			return true
 		}
@@ -111,7 +119,7 @@ func (u *User) Register(c *gin.Context) error {
 		Email:    registerForm.Email,
 		Password: password,
 	}
-	userInfo, err := u.Sev.Create(user)
+	userInfo, err := u.Srv.Create(user)
 	if err != nil {
 		return err
 	}

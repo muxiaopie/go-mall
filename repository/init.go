@@ -1,5 +1,8 @@
 package repository
 
+import (
+	"github.com/jinzhu/gorm"
+)
 
 // 分页
 type Pagination struct {
@@ -21,4 +24,9 @@ func NewPagination(page,limit int) *Pagination {
 		Page:page,
 		Limit:limit,
 	}
+}
+
+// 分页
+func (p *Pagination) Pagination (db *gorm.DB) *gorm.DB  {
+	return db.Limit(p.Page).Offset((p.Page - 1) * p.Limit)
 }

@@ -26,7 +26,7 @@ type CategoryRepository interface {
 	Find(id int)(model.Category,error)
 	Update(category model.Category) error
 	Delete(category model.Category) error
-	Pagination(page,limit int) (*Pagination,error)
+	//Pagination(page,limit int) (*Pagination,error)
 }
 
 type Category struct {
@@ -54,17 +54,18 @@ func (repo *Category) Delete (category model.Category) error {
 }
 
 // 分页
-func (repo *Category) Pagination (page,limit int) (*Pagination,error)  {
-	var categoryList []*model.Category
-	p := NewPagination(page,limit)
-	err := repo.DB.Limit(p.Page).Offset((p.Page - 1) * p.Limit).Find(&categoryList).Error
-	if err != nil {
-		return p,err
-	}
-	var count int
-	repo.DB.Find(&categoryList).Count(&count)
-	p.Total = count
-	p.Items = categoryList
-	return p,nil
-}
+//func (repo *Category) Pagination (page,limit int) (*Pagination,error)  {
+//	var categoryList []*model.Category
+//	p := NewPagination(page,limit)
+//	err := repo.DB.Limit(p.Page).Offset((p.Page - 1) * p.Limit).Find(&categoryList).Error
+//	if err != nil {
+//		return p,err
+//	}
+//	var count int
+//	repo.DB.Find(&categoryList).Count(&count)
+//	p.Total = count
+//	p.Items = categoryList
+//	return p,nil
+//}
+
 
