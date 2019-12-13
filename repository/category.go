@@ -26,7 +26,8 @@ type CategoryRepository interface {
 	Find(id int)(model.Category,error)
 	Update(category model.Category) error
 	Delete(category model.Category) error
-	//Pagination(page,limit int) (*Pagination,error)
+	Pagination(page,limit int,maps map[string]interface{}) (*Pagination,error)
+	ByName(name string) (model.Category,error)
 }
 
 type Category struct {
@@ -36,6 +37,11 @@ type Category struct {
 // 增
 func (repo *Category) Create(category model.Category) (model.Category,error) {
 	return category,repo.DB.Create(&category).Error
+}
+
+func (repo *Category) ByName(name string) (model.Category,error) {
+	var category model.Category
+	return category,repo.DB.Where("name = ?",name).First(&category).Error
 }
 
 // 查找
@@ -54,18 +60,21 @@ func (repo *Category) Delete (category model.Category) error {
 }
 
 // 分页
-//func (repo *Category) Pagination (page,limit int) (*Pagination,error)  {
-//	var categoryList []*model.Category
-//	p := NewPagination(page,limit)
-//	err := repo.DB.Limit(p.Page).Offset((p.Page - 1) * p.Limit).Find(&categoryList).Error
-//	if err != nil {
-//		return p,err
-//	}
-//	var count int
-//	repo.DB.Find(&categoryList).Count(&count)
-//	p.Total = count
-//	p.Items = categoryList
-//	return p,nil
-//}
+func (repo *Category) Pagination (page,limit int,maps map[string]interface{}) (*Pagination,error)  {
+	var categorys []*model.Category
+	/*p := NewPagination(page,limit)
+	err := repo.DB.Limit(p.Page).Offset((p.Page - 1) * p.Limit).Find(&categoryList).Error
+	if err != nil {
+		return p,err
+	}*/
+
+	p := NewPagination(page,limit)
+	p.Pagination(repo.DB).Where(maps).Find(&categorys)
+	var count int
+	repo.DB.Find(&model.Category{}).Where(maps).Count(&count)
+	p.Total = count
+	p.Items = categorys
+	return p,nil
+}
 
 

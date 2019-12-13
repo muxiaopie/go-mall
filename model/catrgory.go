@@ -8,3 +8,7 @@ type Category struct {
 	Sort 	   int 		`json:"sort"`
 	Status     uint 	`json:"-" gorm:"default:1"`
 }
+
+func (c Category) TableName() string {
+	return "category"
+}

@@ -26,6 +26,13 @@ func Init()  {
 		Srv:service.NewUserService(),
 	}
 
+	category := handler.Category{
+		Sev:service.NewCategoryService(),
+	}
+
+
+
+
 
 	router.POST("/login",wrapper(user.Login))
 	router.Any("/users",wrapper(user.Users))
@@ -34,6 +41,13 @@ func Init()  {
 	u := router.Group("/user",middleware.JWTAuth())
 	{
 		u.Any("",wrapper(user.User))
+	}
+
+	categoryRouter := router.Group("/category")
+	{
+		categoryRouter.POST("update",wrapper(category.Update))
+		categoryRouter.POST("create",wrapper(category.Create))
+		categoryRouter.POST("list",wrapper(category.List))
 	}
 
 	v1 := router.Group("/sd")
