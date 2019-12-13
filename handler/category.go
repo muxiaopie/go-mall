@@ -20,7 +20,7 @@ type (
 		Logo string `valid:"required"`
 		Sort int `valid:"required"`
 	}
-
+	// 分页
 	Page struct {
 		Page,Limit int
 	}

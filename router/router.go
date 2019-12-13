@@ -22,30 +22,32 @@ func Init()  {
 	router.NoMethod(errno.HandleNotFound)
 	router.NoRoute(errno.HandleNotFound)
 
+	// 用户
 	user := handler.User{
 		Srv:service.NewUserService(),
 	}
 
+	// 类目
 	category := handler.Category{
 		Sev:service.NewCategoryService(),
 	}
 
 	router.POST("/login",wrapper(user.Login))
-	router.Any("/users",wrapper(user.Users))
+	router.POST("/users",wrapper(user.Users))
 	router.POST("/register",wrapper(user.Register))
 
-	u := router.Group("/user",middleware.JWTAuth())
+	userV1 := router.Group("/user",middleware.JWTAuth())
 	{
-		u.Any("",wrapper(user.User))
+		userV1.POST("",wrapper(user.User))
 	}
 
 	//
-	c := router.Group("/category")
+	categoryV1 := router.Group("/category")
 	{
-		c.POST("update/:id",wrapper(category.Update))
-		c.POST("create",wrapper(category.Create))
-		c.POST("list",wrapper(category.List))
-		c.GET("delete/:id",wrapper(category.Delete))
+		categoryV1.POST("update/:id",wrapper(category.Update))
+		categoryV1.POST("create",wrapper(category.Create))
+		categoryV1.POST("list",wrapper(category.List))
+		categoryV1.GET("delete/:id",wrapper(category.Delete))
 	}
 
 	v1 := router.Group("/sd")
