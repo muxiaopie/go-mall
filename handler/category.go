@@ -27,7 +27,7 @@ type (
 )
 
 // 删除
-func (h *Category)Delete(c *gin.Context) error  {
+func (h *Category) Delete (c *gin.Context) error  {
 	id := c.Param("id")
 	categoryId, err := strconv.Atoi(id)
 	category,err := h.Sev.Find(categoryId)
@@ -43,7 +43,7 @@ func (h *Category)Delete(c *gin.Context) error  {
 }
 
 // 列表
-func (h *Category) List(c *gin.Context) error {
+func (h *Category) List (c *gin.Context) error {
 	var page Page
 	if err := c.ShouldBindJSON(&page); err != nil {
 		return err
@@ -73,7 +73,7 @@ func (h *Category) List(c *gin.Context) error {
 }
 
 // 修改
-func (h *Category) Update(c *gin.Context) error {
+func (h *Category) Update (c *gin.Context) error {
 	var categoryForm CategoryForm
 	if err := c.ShouldBindJSON(&categoryForm); err != nil {
 		return err

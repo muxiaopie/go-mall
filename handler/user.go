@@ -54,7 +54,7 @@ func (u *User) User (c *gin.Context) error {
 }
 
 // 登陆接口
-func (u *User) Login(c *gin.Context) error {
+func (u *User) Login (c *gin.Context) error {
 	var loginForm LoginForm
 	if err := c.ShouldBindJSON(&loginForm); err != nil {
 		return err
@@ -83,7 +83,7 @@ func (u *User) Login(c *gin.Context) error {
 }
 
 // 注册接口
-func (u *User) Register(c *gin.Context) error {
+func (u *User) Register (c *gin.Context) error {
 	var registerForm RegisterForm
 	if err := c.ShouldBindJSON(&registerForm); err != nil {
 		return err
