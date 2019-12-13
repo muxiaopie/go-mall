@@ -30,10 +30,6 @@ func Init()  {
 		Sev:service.NewCategoryService(),
 	}
 
-
-
-
-
 	router.POST("/login",wrapper(user.Login))
 	router.Any("/users",wrapper(user.Users))
 	router.POST("/register",wrapper(user.Register))
@@ -43,11 +39,13 @@ func Init()  {
 		u.Any("",wrapper(user.User))
 	}
 
-	categoryRouter := router.Group("/category")
+	//
+	c := router.Group("/category")
 	{
-		categoryRouter.POST("update",wrapper(category.Update))
-		categoryRouter.POST("create",wrapper(category.Create))
-		categoryRouter.POST("list",wrapper(category.List))
+		c.POST("update/:id",wrapper(category.Update))
+		c.POST("create",wrapper(category.Create))
+		c.POST("list",wrapper(category.List))
+		c.GET("delete/:id",wrapper(category.Delete))
 	}
 
 	v1 := router.Group("/sd")

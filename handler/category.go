@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/muxiaopie/go-mall/model"
 	"github.com/muxiaopie/go-mall/pkg/errno"
 	"github.com/muxiaopie/go-mall/service"
 	"regexp"
+	"strconv"
 )
 
 type (
@@ -21,20 +21,29 @@ type (
 		Sort int `valid:"required"`
 	}
 
-	UpdateCategoryForm struct {
-		Id int `valid:"required"`
-		CategoryForm
-	}
-
 	Page struct {
 		Page,Limit int
 	}
-
 )
 
+// 删除
+func (h *Category)Delete(c *gin.Context) error  {
+	id := c.Param("id")
+	categoryId, err := strconv.Atoi(id)
+	category,err := h.Sev.Find(categoryId)
 
+	if err != nil {
+		return err
+	}
+	err = h.Sev.Delete(category)
+	if err != nil {
+		return err
+	}
+	return errno.Success
+}
 
-func (category *Category) List(c *gin.Context) error {
+// 列表
+func (h *Category) List(c *gin.Context) error {
 	var page Page
 	if err := c.ShouldBindJSON(&page); err != nil {
 		return err
@@ -45,8 +54,16 @@ func (category *Category) List(c *gin.Context) error {
 	if err != nil {
 		return errno.ParameterError(err.Error())
 	}
+	// where条件
 	var maps map[string]interface{}
-	pagination,err := category.Sev.Pagination(page.Page,page.Limit,maps)
+
+	// 搜索
+	name := c.DefaultQuery("name", "")
+	if name != "" {
+		maps["name"] = name
+	}
+
+	pagination,err := h.Sev.Pagination(page.Page,page.Limit,maps)
 	if err != nil {
 		return err
 	}
@@ -56,22 +73,29 @@ func (category *Category) List(c *gin.Context) error {
 }
 
 // 修改
-func (category *Category) Update(c *gin.Context) error {
-	var categoryForm UpdateCategoryForm
+func (h *Category) Update(c *gin.Context) error {
+	var categoryForm CategoryForm
 	if err := c.ShouldBindJSON(&categoryForm); err != nil {
+		return err
+	}
+
+	id := c.Param("id")
+
+	categoryId, err := strconv.Atoi(id)
+
+	if err != nil {
 		return err
 	}
 
 	// 验证唯一性
 	govalidator.ParamTagMap["unique"] = govalidator.ParamValidator(func(value string, params ...string) bool {
-		categoryInfo,err := category.Sev.ByName(value)
-		id := uint(categoryForm.Id)
+		categoryInfo,err := h.Sev.ByName(value)
 
 		if err != nil {
 			return true
 		}
 
-		if categoryInfo.Id == id  {
+		if categoryInfo.Id == uint(categoryId)  {
 			return true
 		}
 
@@ -83,33 +107,27 @@ func (category *Category) Update(c *gin.Context) error {
 	govalidator.ParamTagRegexMap["unique"] = regexp.MustCompile("^unique\\((\\w+)\\)$")
 
 	// 验证
-	_, err := govalidator.ValidateStruct(categoryForm)
+	_, err = govalidator.ValidateStruct(categoryForm)
 	if err != nil {
 		return errno.ParameterError(err.Error())
 	}
-
-	categoryModel,err := category.Sev.Find(categoryForm.Id)
-	fmt.Println(categoryModel)
-
+	category,err := h.Sev.Find(categoryId)
 	if err != nil {
 		return err
 	}
-	categoryModel.Name = categoryForm.Name
-	categoryModel.Desc = categoryForm.Desc
-	categoryModel.Logo = categoryForm.Logo
-	categoryModel.Sort = categoryForm.Sort
-
-	err = category.Sev.Update(categoryModel)
-
+	category.Name = categoryForm.Name
+	category.Desc = categoryForm.Desc
+	category.Logo = categoryForm.Logo
+	category.Sort = categoryForm.Sort
+	err = h.Sev.Update(category)
 	if err != nil {
 		return err
 	}
-
 	return errno.Success
 }
 
 // 新增
-func (category *Category) Create (c *gin.Context) error {
+func (h *Category) Create (c *gin.Context) error {
 
 	var categoryForm CategoryForm
 	if err := c.ShouldBindJSON(&categoryForm); err != nil {
@@ -118,7 +136,7 @@ func (category *Category) Create (c *gin.Context) error {
 
 	// 验证唯一性
 	govalidator.ParamTagMap["unique"] = govalidator.ParamValidator(func(value string, params ...string) bool {
-		categoryInfo,err := category.Sev.ByName(value)
+		categoryInfo,err := h.Sev.ByName(value)
 
 		if err != nil {
 			return true
@@ -136,7 +154,7 @@ func (category *Category) Create (c *gin.Context) error {
 		return errno.ParameterError(err.Error())
 	}
 
-	categoryModel,err := category.Sev.Create(model.Category{
+	category,err := h.Sev.Create(model.Category{
 		Name:categoryForm.Name,
 		Desc:categoryForm.Desc,
 		Logo:categoryForm.Logo,
@@ -147,7 +165,7 @@ func (category *Category) Create (c *gin.Context) error {
 		return err
 	}
 
-	c.JSON(statusOk,categoryModel)
+	c.JSON(statusOk,category)
 	return nil
 }
 

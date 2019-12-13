@@ -4,20 +4,19 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/muxiaopie/go-mall/bootstrap"
 	"github.com/muxiaopie/go-mall/model"
-	"sync"
 )
-
-
-var categoryOnce sync.Once
-
+// var categoryOnce sync.Once
 // 获取repository
 func NewCategoryRepository() (categoryRepository CategoryRepository) {
-	categoryOnce.Do(func() {
+	return &Category{
+		DB:bootstrap.Bootstrap.DB,
+	}
+	/*categoryOnce.Do(func() {
 		categoryRepository = &Category{
 			DB:bootstrap.Bootstrap.DB,
 		}
 	})
-	return categoryRepository
+	return categoryRepository*/
 }
 
 

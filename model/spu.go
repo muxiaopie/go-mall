@@ -19,3 +19,12 @@ type Spu struct {
 	Brand 			Brand 	 `json:"brand"`
 	Category        Category `json:"category"`
 }
+
+
+type SpuImage struct {
+	Model
+	Type     int
+	SpuId    int
+	ImageUrl string
+	Status   int
+}

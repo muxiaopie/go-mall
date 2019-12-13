@@ -5,18 +5,20 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/muxiaopie/go-mall/bootstrap"
 	"github.com/muxiaopie/go-mall/model"
-	"sync"
 )
 
-var userOnce sync.Once
+// var userOnce sync.Once
 // 获取repository
 func NewUserRepository() (userRepository UserRepository) {
-	userOnce.Do(func() {
+	return &User{
+		DB:bootstrap.Bootstrap.DB,
+	}
+	/*userOnce.Do(func() {
 		userRepository = &User{
 			DB:bootstrap.Bootstrap.DB,
 		}
 	})
-	return userRepository
+	return userRepository*/
 }
 
 // user

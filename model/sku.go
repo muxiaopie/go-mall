@@ -11,3 +11,12 @@ type Sku struct {
 	Sort 	   		int 	 `json:"sort"`
 	Status     		uint 	 `json:"-" gorm:"default:1"`
 }
+
+
+type SkuImage struct {
+	Model
+	SpuId    int 		`json:"spuId"`
+	ImageUrl string 	`json:"imageUrl"`
+	Type     int 		`json:"type"`
+	Status   int 		`json:"-" gorm:"default:1"`
+}

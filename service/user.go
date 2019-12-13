@@ -5,19 +5,21 @@ import (
 	"github.com/muxiaopie/go-mall/model"
 	"github.com/muxiaopie/go-mall/pkg/enum"
 	"github.com/muxiaopie/go-mall/repository"
-	"sync"
 )
 
-var userOnce sync.Once
-
+// var userOnce sync.Once
 // 获取服务
 func NewUserService() (userService UserService) {
-	userOnce.Do(func() {
+
+	return &User{
+		Repo: repository.NewUserRepository(),
+	}
+	/*userOnce.Do(func() {
 		userService = &User{
 			Repo: repository.NewUserRepository(),
 		}
 	})
-	return userService
+	return userService*/
 }
 
 // service 服务

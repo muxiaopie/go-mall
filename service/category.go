@@ -3,10 +3,9 @@ package service
 import (
 	"github.com/muxiaopie/go-mall/model"
 	"github.com/muxiaopie/go-mall/repository"
-	"sync"
 )
 
-var categoryOnce sync.Once
+// var categoryOnce sync.Once
 
 
 type (
@@ -27,12 +26,16 @@ type (
 
 // 获取服务
 func NewCategoryService() (categoryService CategoryService) {
-	categoryOnce.Do(func() {
+
+	return &Category{
+		Repo:repository.NewCategoryRepository(),
+	}
+	/*categoryOnce.Do(func() {
 		categoryService = &Category{
 			Repo:repository.NewCategoryRepository(),
 		}
 	})
-	return categoryService
+	return categoryService*/
 }
 
 func (sev *Category) Create(category model.Category) (model.Category, error) {

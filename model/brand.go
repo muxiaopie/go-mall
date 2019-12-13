@@ -9,3 +9,7 @@ type Brand struct {
 	Status     uint 	`json:"-" gorm:"default:1"`
 	CategoryId int  	`json:"category_id"`
 }
+
+func (b Brand) TableName() string {
+	return "brand"
+}

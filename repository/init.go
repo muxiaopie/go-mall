@@ -17,7 +17,7 @@ func NewPagination(page,limit int) *Pagination {
 	if page <= 0 {
 		page = 1
 	}
-	if limit >= 100 {
+	if limit >= 100 || limit <= 0 {
 		limit = 50
 	}
 	return &Pagination{
