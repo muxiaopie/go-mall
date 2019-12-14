@@ -32,6 +32,11 @@ func Init()  {
 		Sev:service.NewCategoryService(),
 	}
 
+	// brand
+	brand := handler.Brand{
+		Sev:service.NewBrandService(),
+	}
+
 	router.POST("/login",wrapper(user.Login))
 	router.POST("/users",wrapper(user.Users))
 	router.POST("/register",wrapper(user.Register))
@@ -48,6 +53,15 @@ func Init()  {
 		categoryV1.POST("create",wrapper(category.Create))
 		categoryV1.POST("list",wrapper(category.List))
 		categoryV1.GET("delete/:id",wrapper(category.Delete))
+	}
+
+
+	brandV1 := router.Group("/brand")
+	{
+		brandV1.POST("update/:id",wrapper(brand.Update))
+		brandV1.POST("create",wrapper(brand.Create))
+		brandV1.POST("list",wrapper(brand.List))
+		brandV1.GET("delete/:id",wrapper(brand.Delete))
 	}
 
 	v1 := router.Group("/sd")

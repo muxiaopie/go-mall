@@ -7,19 +7,11 @@ import (
 	"github.com/muxiaopie/go-mall/repository"
 )
 
-// var userOnce sync.Once
 // 获取服务
 func NewUserService() (userService UserService) {
-
 	return &User{
 		Repo: repository.NewUserRepository(),
 	}
-	/*userOnce.Do(func() {
-		userService = &User{
-			Repo: repository.NewUserRepository(),
-		}
-	})
-	return userService*/
 }
 
 // service 服务
