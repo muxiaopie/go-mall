@@ -11,6 +11,10 @@ var (
 	statusOk = http.StatusOK
 )
 
+type Page struct {
+	Page,Limit int
+}
+
 func userId(c *gin.Context) (uint, error) {
 	if claims, ok := c.Get("claims"); ok {
 		if claims, ok := claims.(*jwt.Claims); ok {

@@ -14,16 +14,7 @@ type (
 	Category struct {
 		Srv service.CategoryService
 	}
-	CategoryForm struct {
-		Name string `valid:"required,unique(name)"`
-		Desc string `valid:"required"`
-		Logo string `valid:"required"`
-		Sort int `valid:"required"`
-	}
-	// 分页
-	Page struct {
-		Page,Limit int
-	}
+
 )
 
 // 删除
@@ -73,7 +64,7 @@ func (h *Category) List (c *gin.Context) {
 
 // 修改
 func (h *Category) Update (c *gin.Context) {
-	var categoryForm CategoryForm
+	var categoryForm model.Category
 	if err := c.ShouldBindJSON(&categoryForm); err != nil {
 		panic(err)
 	}
@@ -129,7 +120,7 @@ func (h *Category) Update (c *gin.Context) {
 // 新增
 func (h *Category) Create (c *gin.Context)  {
 
-	var categoryForm CategoryForm
+	var categoryForm model.Category
 	if err := c.ShouldBindJSON(&categoryForm); err != nil {
 		panic(err)
 	}

@@ -2,10 +2,10 @@ package model
 
 type Category struct {
 	Model
-	Name 	   string 	`json:"username"`
-	Desc 	   string 	`json:"nickname"`
-	Logo 	   string 	`json:"logo"`
-	Sort 	   int 		`json:"sort"`
+	Name 	   string 	`json:"username" valid:"required,unique(name)"`
+	Desc 	   string 	`json:"nickname" valid:"required"`
+	Logo 	   string 	`json:"logo" valid:"required"`
+	Sort 	   int 		`json:"sort" valid:"required"`
 	Status     uint 	`json:"-" gorm:"default:1"`
 }
 
