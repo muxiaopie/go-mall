@@ -2,6 +2,7 @@ package sd
 
 import (
 	"fmt"
+	"github.com/muxiaopie/go-mall/pkg/errno"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -26,8 +27,7 @@ const (
 // @Success 200 {string} plain "OK"
 // @Router /sd/health [get]
 func HealthCheck(c *gin.Context) {
-	message := "OK"
-	c.String(http.StatusOK, "\n"+message)
+	panic(errno.Success)
 }
 
 // @Summary Checks the disk usage
@@ -41,24 +41,33 @@ func DiskCheck(c *gin.Context) {
 	u, _ := disk.Usage("/")
 
 	usedMB := int(u.Used) / MB
-	usedGB := int(u.Used) / GB
+	//usedGB := int(u.Used) / GB
 	totalMB := int(u.Total) / MB
-	totalGB := int(u.Total) / GB
+	//totalGB := int(u.Total) / GB
 	usedPercent := int(u.UsedPercent)
 
 	status := http.StatusOK
-	text := "OK"
+	//text := "OK"
 
-	if usedPercent >= 95 {
+	/*if usedPercent >= 95 {
 		status = http.StatusOK
 		text = "CRITICAL"
 	} else if usedPercent >= 90 {
 		status = http.StatusTooManyRequests
 		text = "WARNING"
-	}
+	}*/
 
-	message := fmt.Sprintf("%s - Free space: %dMB (%dGB) / %dMB (%dGB) | Used: %d%%", text, usedMB, usedGB, totalMB, totalGB, usedPercent)
-	c.String(status, "\n"+message)
+	//message := fmt.Sprintf("%s - Free space: %dMB (%dGB) / %dMB (%dGB) | Used: %d%%", text, usedMB, usedGB, totalMB, totalGB, usedPercent)
+
+	c.JSON(status, struct {
+		FreeSpace  int `json:"free_space"`
+		TotalSpace int `json:"total_space"`
+		Percent  int `json:"percent"`
+	}{
+		usedMB,
+		totalMB,
+		usedPercent,
+	})
 }
 
 // @Summary Checks the cpu usage

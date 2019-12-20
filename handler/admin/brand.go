@@ -1,4 +1,4 @@
-package handler
+package admin
 
 import (
 	"github.com/asaskevich/govalidator"
@@ -12,44 +12,38 @@ import (
 
 type (
 	Brand struct {
-		Sev service.BrandService
-	}
-	BrandForm struct {
-		Name string `valid:"required,unique(name)"`
-		Desc string `valid:"required"`
-		Logo string `valid:"required"`
-		Sort int `valid:"required"`
+		Srv service.BrandService
 	}
 )
 
 
 // 删除
-func (h *Brand) Delete (c *gin.Context) error  {
+func (h *Brand) Delete (c *gin.Context)  {
 	id := c.Param("id")
 	brandId, err := strconv.Atoi(id)
-	brand,err := h.Sev.Find(brandId)
+	brand,err := h.Srv.Find(brandId)
 
 	if err != nil {
-		return err
+		panic(err)
 	}
-	err = h.Sev.Delete(brand)
+	err = h.Srv.Delete(brand)
 	if err != nil {
-		return err
+		panic(err)
 	}
-	return errno.Success
+	panic(errno.Success)
 }
 
 // 列表
-func (h *Brand) List (c *gin.Context) error {
+func (h *Brand) List (c *gin.Context)  {
 	var page Page
 	if err := c.ShouldBindJSON(&page); err != nil {
-		return err
+		panic(err)
 	}
 
 	// 验证
 	_, err := govalidator.ValidateStruct(page)
 	if err != nil {
-		return errno.ParameterError(err.Error())
+		panic(errno.ParameterError(err.Error()))
 	}
 	// where条件
 	var maps map[string]interface{}
@@ -60,20 +54,19 @@ func (h *Brand) List (c *gin.Context) error {
 		maps["name"] = name
 	}
 
-	pagination,err := h.Sev.Pagination(page.Page,page.Limit,maps)
+	pagination,err := h.Srv.Pagination(page.Page, page.Limit,maps)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	c.JSON(statusOk,pagination)
 
-	return nil
 }
 
 // 修改
-func (h *Brand) Update (c *gin.Context) error {
-	var brandForm BrandForm
+func (h *Brand) Update (c *gin.Context) {
+	var brandForm model.Brand
 	if err := c.ShouldBindJSON(&brandForm); err != nil {
-		return err
+		panic(err)
 	}
 
 	id := c.Param("id")
@@ -81,12 +74,12 @@ func (h *Brand) Update (c *gin.Context) error {
 	brandId, err := strconv.Atoi(id)
 
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	// 验证唯一性
 	govalidator.ParamTagMap["unique"] = govalidator.ParamValidator(func(value string, params ...string) bool {
-		brandInfo,err := h.Sev.ByName(value)
+		brandInfo,err := h.Srv.ByName(value)
 
 		if err != nil {
 			return true
@@ -106,34 +99,35 @@ func (h *Brand) Update (c *gin.Context) error {
 	// 验证
 	_, err = govalidator.ValidateStruct(brandForm)
 	if err != nil {
-		return errno.ParameterError(err.Error())
+		err := errno.ParameterError(err.Error())
+		panic(err)
 	}
-	brand,err := h.Sev.Find(brandId)
+	brand,err := h.Srv.Find(brandId)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	brand.Name = brandForm.Name
 	brand.Desc = brandForm.Desc
 	brand.Logo = brandForm.Logo
 	brand.Sort = brandForm.Sort
-	err = h.Sev.Update(brand)
+	err = h.Srv.Update(brand)
 	if err != nil {
-		return err
+		panic(err)
 	}
-	return errno.Success
+	panic(errno.Success)
 }
 
 // 新增
-func (h *Brand) Create (c *gin.Context) error {
+func (h *Brand) Create (c *gin.Context) {
 
-	var brandForm BrandForm
+	var brandForm model.Brand
 	if err := c.ShouldBindJSON(&brandForm); err != nil {
-		return err
+		panic(err)
 	}
 
 	// 验证唯一性
 	govalidator.ParamTagMap["unique"] = govalidator.ParamValidator(func(value string, params ...string) bool {
-		brandInfo,err := h.Sev.ByName(value)
+		brandInfo,err := h.Srv.ByName(value)
 
 		if err != nil {
 			return true
@@ -148,10 +142,11 @@ func (h *Brand) Create (c *gin.Context) error {
 	// 验证
 	_, err := govalidator.ValidateStruct(brandForm)
 	if err != nil {
-		return errno.ParameterError(err.Error())
+		err := errno.ParameterError(err.Error())
+		panic(err)
 	}
 
-	brand,err := h.Sev.Create(model.Brand{
+	brand,err := h.Srv.Create(model.Brand{
 		Name:brandForm.Name,
 		Desc:brandForm.Desc,
 		Logo:brandForm.Logo,
@@ -159,9 +154,7 @@ func (h *Brand) Create (c *gin.Context) error {
 	})
 
 	if err != nil {
-		return err
+		panic(err)
 	}
-
 	c.JSON(statusOk,brand)
-	return nil
 }

@@ -1,4 +1,4 @@
-package handler
+package admin
 
 import (
 	"errors"
@@ -31,42 +31,46 @@ type (
 )
 
 // 用户信息
-func (u *User) Users (c *gin.Context) error {
+func (u *User) Users (c *gin.Context) {
 	P := u.Srv.Pagination(1,1)
 
 	c.JSON(statusOk,P)
-	return nil
 }
 
 // 用户信息
-func (u *User) User (c *gin.Context) error {
+func (u *User) User (c *gin.Context) {
 	uid, err := userId(c)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	id := fmt.Sprintf("%d", uid)
 	user, err := u.Srv.Find(enum.ID, id)
 	if err != nil {
-		return errno.NotFound
+		panic(errno.NotFound)
 	}
 	c.JSON(statusOk, user)
-	return nil
 }
 
 // 登陆接口
-func (u *User) Login (c *gin.Context) error {
+func (u *User) Login (c *gin.Context) {
 	var loginForm LoginForm
 	if err := c.ShouldBindJSON(&loginForm); err != nil {
-		return err
+		panic(err)
 	}
 	_, err := govalidator.ValidateStruct(loginForm)
 	if err != nil {
-		return errno.ParameterError(err.Error())
+		err := errno.ParameterError(err.Error())
+		panic(err)
 	}
 	user, err := u.Srv.Find(enum.USERNAME, loginForm.UserName)
 	if err != nil {
-		return err
+		panic(err)
 	}
+
+	if user.Admin != 1 {
+		panic(errors.New("你没有登陆权限"))
+	}
+
 	if util.CheckPasswordHash(loginForm.PassWord, user.Password) {
 		token, _ := jwt.GenerateToken(user.Id)
 		c.JSON(statusOk, struct {
@@ -76,17 +80,16 @@ func (u *User) Login (c *gin.Context) error {
 			Token:      token,
 			ExpireTime: viper.GetString("expireTime"),
 		})
-		return nil
 	} else {
-		return errors.New("密码不正确,请重试")
+		panic(errors.New("密码不正确,请重试"))
 	}
 }
 
 // 注册接口
-func (u *User) Register (c *gin.Context) error {
+func (u *User) Register (c *gin.Context) {
 	var registerForm RegisterForm
 	if err := c.ShouldBindJSON(&registerForm); err != nil {
-		return err
+		panic(err)
 	}
 	// 验证唯一性
 	govalidator.ParamTagMap["unique"] = govalidator.ParamValidator(func(value string, params ...string) bool {
@@ -105,13 +108,15 @@ func (u *User) Register (c *gin.Context) error {
 	// 验证
 	_, err := govalidator.ValidateStruct(registerForm)
 	if err != nil {
-		return errno.ParameterError(err.Error())
+		err := errno.ParameterError(err.Error())
+		panic(err)
 	}
 
 	// 加密
 	password, err := util.HashPassword(registerForm.PassWord)
 	if err != nil {
-		return errno.OtherError("注册失败")
+		err := errno.OtherError("注册失败")
+		panic(err)
 	}
 	// 入库
 	user := model.User{
@@ -121,10 +126,9 @@ func (u *User) Register (c *gin.Context) error {
 	}
 	userInfo, err := u.Srv.Create(user)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	c.JSON(statusOk, userInfo)
-	return nil
 }
 
 
